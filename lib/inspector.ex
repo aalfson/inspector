@@ -45,7 +45,7 @@ defmodule Inspector do
   See `Inspector.Top.top/3` for options, return shape, and supported attributes.
   """
   def top(attribute), do: Inspector.Top.top(attribute)
-  def top(attribute, n) when is_integer(n), do: Inspector.Top.top(attribute, n)
+  def top(attribute, n) when is_integer(n), do: Inspector.Top.top(attribute, n, [])
   def top(attribute, opts) when is_list(opts), do: Inspector.Top.top(attribute, opts)
   def top(attribute, n, opts), do: Inspector.Top.top(attribute, n, opts)
 

@@ -138,6 +138,44 @@ defmodule InspectorTest do
     end
   end
 
+  describe "error propagation through facade" do
+    test "process_info returns error for dead pid" do
+      dead = TestProcesses.spawn_dead()
+      assert {:error, :not_found} = Inspector.process_info(dead)
+    end
+
+    test "mailbox returns error for dead pid" do
+      dead = TestProcesses.spawn_dead()
+      assert {:error, :not_found} = Inspector.mailbox(dead)
+    end
+
+    test "state returns error for non-OTP process" do
+      pid = TestProcesses.spawn_idle()
+      assert {:error, _} = Inspector.state(pid, timeout: 500)
+      Process.exit(pid, :kill)
+    end
+
+    test "top returns error for invalid attribute" do
+      assert {:error, {:invalid_attribute, :bogus}} = Inspector.top(:bogus)
+    end
+
+    test "top/2 returns error for n=0" do
+      assert {:error, :invalid_count} = Inspector.top(:memory, 0)
+    end
+
+    test "top/2 returns error for negative n" do
+      assert {:error, :invalid_count} = Inspector.top(:memory, -1)
+    end
+
+    test "top/3 returns error for window exceeding cap" do
+      assert {:error, :window_too_large} = Inspector.top(:memory, 5, window: 60_000)
+    end
+
+    test "top_memory returns error for invalid n" do
+      assert {:error, :invalid_count} = Inspector.top_memory(0)
+    end
+  end
+
   describe "end-to-end: PID format interop" do
     test "facade functions accept string PIDs" do
       {:ok, pid} = TestProcesses.start_genserver(:test_state)

@@ -84,7 +84,7 @@ defmodule Inspector.Top do
   @doc false
   def top(attribute), do: top(attribute, 10, [])
   @doc false
-  def top(attribute, n) when is_integer(n) and n > 0, do: top(attribute, n, [])
+  def top(attribute, n) when is_integer(n), do: top(attribute, n, [])
   @doc false
   def top(attribute, opts) when is_list(opts), do: top(attribute, 10, opts)
 
