@@ -44,6 +44,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options, return shape, and supported attributes.
   """
+  @spec top(atom(), pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top(attribute), do: Inspector.Top.top(attribute)
   def top(attribute, n) when is_integer(n), do: Inspector.Top.top(attribute, n, [])
   def top(attribute, opts) when is_list(opts), do: Inspector.Top.top(attribute, opts)
@@ -54,6 +56,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options and return shape.
   """
+  @spec top_memory(pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top_memory, do: Inspector.Top.top_memory()
   def top_memory(n) when is_integer(n), do: Inspector.Top.top_memory(n)
   def top_memory(opts) when is_list(opts), do: Inspector.Top.top_memory(opts)
@@ -64,6 +68,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options and return shape.
   """
+  @spec top_reductions(pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top_reductions, do: Inspector.Top.top_reductions()
   def top_reductions(n) when is_integer(n), do: Inspector.Top.top_reductions(n)
   def top_reductions(opts) when is_list(opts), do: Inspector.Top.top_reductions(opts)
@@ -74,6 +80,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options and return shape.
   """
+  @spec top_message_queue(pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top_message_queue, do: Inspector.Top.top_message_queue()
   def top_message_queue(n) when is_integer(n), do: Inspector.Top.top_message_queue(n)
   def top_message_queue(opts) when is_list(opts), do: Inspector.Top.top_message_queue(opts)
@@ -84,6 +92,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options and return shape.
   """
+  @spec top_total_heap(pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top_total_heap, do: Inspector.Top.top_total_heap()
   def top_total_heap(n) when is_integer(n), do: Inspector.Top.top_total_heap(n)
   def top_total_heap(opts) when is_list(opts), do: Inspector.Top.top_total_heap(opts)
@@ -94,6 +104,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options and return shape.
   """
+  @spec top_heap(pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top_heap, do: Inspector.Top.top_heap()
   def top_heap(n) when is_integer(n), do: Inspector.Top.top_heap(n)
   def top_heap(opts) when is_list(opts), do: Inspector.Top.top_heap(opts)
@@ -104,6 +116,8 @@ defmodule Inspector do
 
   See `Inspector.Top.top/3` for options and return shape.
   """
+  @spec top_stack(pos_integer(), keyword()) ::
+          {:ok, [Inspector.Top.result()]} | {:error, term()}
   def top_stack, do: Inspector.Top.top_stack()
   def top_stack(n) when is_integer(n), do: Inspector.Top.top_stack(n)
   def top_stack(opts) when is_list(opts), do: Inspector.Top.top_stack(opts)

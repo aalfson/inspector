@@ -19,6 +19,7 @@ defmodule Inspector.Top do
   @valid_attributes ~w(memory reductions message_queue_len total_heap_size heap_size stack_size)a
   @max_window 30_000
 
+  @typedoc "A process entry with its attribute value and identifying info."
   @type result :: %{
           pid: pid(),
           value: integer(),
