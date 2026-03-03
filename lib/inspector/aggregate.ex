@@ -12,6 +12,10 @@ defmodule Inspector.Aggregate do
 
   alias Inspector.Utils
 
+  @default_max_concurrency System.schedulers_online() * 2
+  @default_timeout 15_000
+
+  @typedoc "A function grouped with its occurrence count."
   @type function_count :: %{
           function: {module(), atom(), arity()},
           count: pos_integer()
@@ -26,7 +30,9 @@ defmodule Inspector.Aggregate do
   ## Examples
 
       iex> pids = Inspector.Aggregate.list_pids()
-      iex> {:ok, _results} = Inspector.Aggregate.current_functions(pids)
+      iex> results = Inspector.Aggregate.current_functions(pids)
+      iex> is_list(results)
+      true
 
   """
   @spec list_pids() :: [pid()]
@@ -38,16 +44,15 @@ defmodule Inspector.Aggregate do
   Returns a list of `%{function: {M, F, A}, count: n}` maps sorted
   descending by count.
 
-  ## Examples
+  ## Options
 
-      iex> pids = Process.list()
-      iex> {:ok, results} = Inspector.Aggregate.current_functions(pids)
-      iex> [%{function: {_, _, _}, count: _} | _] = results
+    * `:max_concurrency` — max parallel tasks (default: `schedulers_online * 2`)
+    * `:timeout` — per-task timeout in ms (default: #{@default_timeout})
 
   """
-  @spec current_functions([Utils.pid_input()]) :: {:ok, [function_count()]}
-  def current_functions(pid_inputs) do
-    {:ok, aggregate_by(pid_inputs, :current_function)}
+  @spec current_functions([Utils.pid_input()], keyword()) :: [function_count()]
+  def current_functions(pid_inputs, opts \\ []) do
+    aggregate_by(pid_inputs, :current_function, opts)
   end
 
   @doc """
@@ -56,23 +61,27 @@ defmodule Inspector.Aggregate do
   Returns a list of `%{function: {M, F, A}, count: n}` maps sorted
   descending by count.
 
-  ## Examples
+  ## Options
 
-      iex> pids = Process.list()
-      iex> {:ok, results} = Inspector.Aggregate.initial_calls(pids)
-      iex> [%{function: {_, _, _}, count: _} | _] = results
+    * `:max_concurrency` — max parallel tasks (default: `schedulers_online * 2`)
+    * `:timeout` — per-task timeout in ms (default: #{@default_timeout})
 
   """
-  @spec initial_calls([Utils.pid_input()]) :: {:ok, [function_count()]}
-  def initial_calls(pid_inputs) do
-    {:ok, aggregate_by(pid_inputs, :initial_call)}
+  @spec initial_calls([Utils.pid_input()], keyword()) :: [function_count()]
+  def initial_calls(pid_inputs, opts \\ []) do
+    aggregate_by(pid_inputs, :initial_call, opts)
   end
 
-  defp aggregate_by(pid_inputs, info_key) do
+  defp aggregate_by(pid_inputs, info_key, opts) do
+    max_concurrency = Keyword.get(opts, :max_concurrency, @default_max_concurrency)
+    timeout = Keyword.get(opts, :timeout, @default_timeout)
+
     pid_inputs
     |> convert_pids()
     |> Task.async_stream(
       fn pid -> :erlang.process_info(pid, info_key) end,
+      max_concurrency: max_concurrency,
+      timeout: timeout,
       ordered: false
     )
     |> Stream.flat_map(fn
