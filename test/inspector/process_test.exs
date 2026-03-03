@@ -8,9 +8,8 @@ defmodule Inspector.ProcessTest do
     test "returns categorized map for a live GenServer" do
       {:ok, pid} = TestProcesses.start_genserver(%{x: 1})
 
-      result = Proc.info(pid)
+      assert {:ok, result} = Proc.info(pid)
 
-      assert is_map(result)
       assert Map.has_key?(result, :meta)
       assert Map.has_key?(result, :signals)
       assert Map.has_key?(result, :location)
@@ -26,7 +25,7 @@ defmodule Inspector.ProcessTest do
 
     test "returns initial_call in location" do
       {:ok, pid} = TestProcesses.start_genserver(:state)
-      result = Proc.info(pid)
+      assert {:ok, result} = Proc.info(pid)
 
       assert {_m, _f, _a} = result.location.initial_call
 
@@ -45,8 +44,7 @@ defmodule Inspector.ProcessTest do
         pid |> inspect() |> String.trim_leading("#PID<") |> String.trim_trailing(">")
         |> String.split(".") |> Enum.map(&String.to_integer/1)
 
-      result = Proc.info({a, b, c})
-      assert is_map(result)
+      assert {:ok, result} = Proc.info({a, b, c})
       assert Map.has_key?(result, :meta)
 
       GenServer.stop(pid)
@@ -57,7 +55,7 @@ defmodule Inspector.ProcessTest do
     test "returns messages from a process" do
       pid = TestProcesses.spawn_with_mailbox(3)
 
-      result = Proc.mailbox(pid)
+      assert {:ok, result} = Proc.mailbox(pid)
 
       assert result.total == 3
       assert result.returned == 3
@@ -70,12 +68,11 @@ defmodule Inspector.ProcessTest do
     test "respects :limit option" do
       pid = TestProcesses.spawn_with_mailbox(10)
 
-      result = Proc.mailbox(pid, limit: 3)
+      assert {:ok, result} = Proc.mailbox(pid, limit: 3)
 
       assert result.total == 10
       assert result.returned == 3
       assert result.truncated == true
-      assert length(result.messages) == 3
       assert result.messages == [{:msg, 1}, {:msg, 2}, {:msg, 3}]
 
       Process.exit(pid, :kill)
@@ -84,7 +81,7 @@ defmodule Inspector.ProcessTest do
     test "returns truncated: true when messages exceed default limit" do
       pid = TestProcesses.spawn_with_mailbox(150)
 
-      result = Proc.mailbox(pid)
+      assert {:ok, result} = Proc.mailbox(pid)
 
       assert result.total == 150
       assert result.returned == 100
@@ -109,7 +106,7 @@ defmodule Inspector.ProcessTest do
     test "bypasses hard cap with force: true" do
       pid = TestProcesses.spawn_with_mailbox(1_001)
 
-      result = Proc.mailbox(pid, force: true, limit: 5)
+      assert {:ok, result} = Proc.mailbox(pid, force: true, limit: 5)
 
       assert result.total == 1_001
       assert result.returned == 5
@@ -121,7 +118,7 @@ defmodule Inspector.ProcessTest do
     test "returns empty messages for process with no mail" do
       pid = TestProcesses.spawn_idle()
 
-      result = Proc.mailbox(pid)
+      assert {:ok, result} = Proc.mailbox(pid)
 
       assert result.total == 0
       assert result.returned == 0
@@ -136,7 +133,7 @@ defmodule Inspector.ProcessTest do
     test "returns GenServer state" do
       {:ok, pid} = TestProcesses.start_genserver(%{count: 42})
 
-      assert %{count: 42} = Proc.state(pid)
+      assert {:ok, %{count: 42}} = Proc.state(pid)
 
       GenServer.stop(pid)
     end
@@ -144,10 +141,9 @@ defmodule Inspector.ProcessTest do
     test "returns updated state after cast" do
       {:ok, pid} = TestProcesses.start_genserver(:initial)
       GenServer.cast(pid, {:set_state, :updated})
-      # Small sleep to let the cast process
       Process.sleep(10)
 
-      assert :updated = Proc.state(pid)
+      assert {:ok, :updated} = Proc.state(pid)
 
       GenServer.stop(pid)
     end
@@ -155,9 +151,7 @@ defmodule Inspector.ProcessTest do
     test "returns {:error, _} for a non-OTP process" do
       pid = TestProcesses.spawn_idle()
 
-      result = Proc.state(pid, timeout: 500)
-
-      assert {:error, _reason} = result
+      assert {:error, _reason} = Proc.state(pid, timeout: 500)
 
       Process.exit(pid, :kill)
     end
@@ -165,16 +159,13 @@ defmodule Inspector.ProcessTest do
     test "returns {:error, _} for a dead pid" do
       dead = TestProcesses.spawn_dead()
 
-      result = Proc.state(dead, timeout: 500)
-
-      assert {:error, _reason} = result
+      assert {:error, _reason} = Proc.state(dead, timeout: 500)
     end
 
     test "respects custom timeout" do
       {:ok, pid} = TestProcesses.start_genserver(:state)
 
-      # Should succeed with generous timeout
-      assert :state = Proc.state(pid, timeout: 30_000)
+      assert {:ok, :state} = Proc.state(pid, timeout: 30_000)
 
       GenServer.stop(pid)
     end
