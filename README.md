@@ -15,6 +15,18 @@ def deps do
 end
 ```
 
+## LiveDashboard Integration
+
+Add Inspector as a page in your Phoenix LiveDashboard:
+
+```elixir
+# router.ex
+live_dashboard "/dashboard",
+  additional_pages: [inspector: Inspector.Dashboard.Page]
+```
+
+Requires `phoenix_live_dashboard ~> 0.8` and `phoenix_live_view ~> 1.0` in your deps (already included as optional deps in Inspector).
+
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/inspector>.

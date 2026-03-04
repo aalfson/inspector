@@ -192,8 +192,12 @@ defmodule InspectorTest do
       {:ok, pid} = TestProcesses.start_genserver(:test_state)
 
       [a, b, c] =
-        pid |> inspect() |> String.trim_leading("#PID<") |> String.trim_trailing(">")
-        |> String.split(".") |> Enum.map(&String.to_integer/1)
+        pid
+        |> inspect()
+        |> String.trim_leading("#PID<")
+        |> String.trim_trailing(">")
+        |> String.split(".")
+        |> Enum.map(&String.to_integer/1)
 
       assert {:ok, _info} = Inspector.process_info({a, b, c})
       assert {:ok, :test_state} = Inspector.state({a, b, c})
