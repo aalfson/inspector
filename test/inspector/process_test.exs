@@ -41,8 +41,12 @@ defmodule Inspector.ProcessTest do
       {:ok, pid} = TestProcesses.start_genserver(:state)
 
       [a, b, c] =
-        pid |> inspect() |> String.trim_leading("#PID<") |> String.trim_trailing(">")
-        |> String.split(".") |> Enum.map(&String.to_integer/1)
+        pid
+        |> inspect()
+        |> String.trim_leading("#PID<")
+        |> String.trim_trailing(">")
+        |> String.split(".")
+        |> Enum.map(&String.to_integer/1)
 
       assert {:ok, result} = Proc.info({a, b, c})
       assert Map.has_key?(result, :meta)

@@ -25,7 +25,10 @@ defmodule Inspector.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:recon, "~> 2.5.6"}
+      {:recon, "~> 2.5.6"},
+      {:phoenix_live_dashboard, "~> 0.8", optional: true},
+      {:phoenix_live_view, "~> 1.0", optional: true},
+      {:floki, "~> 0.36", only: :test}
     ]
   end
 end

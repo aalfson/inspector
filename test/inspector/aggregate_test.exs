@@ -49,8 +49,12 @@ defmodule Inspector.AggregateTest do
       pid = TestProcesses.spawn_idle()
 
       [a, b, c] =
-        pid |> inspect() |> String.trim_leading("#PID<") |> String.trim_trailing(">")
-        |> String.split(".") |> Enum.map(&String.to_integer/1)
+        pid
+        |> inspect()
+        |> String.trim_leading("#PID<")
+        |> String.trim_trailing(">")
+        |> String.split(".")
+        |> Enum.map(&String.to_integer/1)
 
       inputs = [pid, {a, b, c}, "<#{a}.#{b}.#{c}>"]
 
