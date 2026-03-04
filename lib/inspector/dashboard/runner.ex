@@ -36,8 +36,10 @@ defmodule Inspector.Dashboard.Runner do
 
       _func_def ->
         try do
-          result = FunctionDefs.execute(function_key, parsed_params)
-          {:ok, format_result(result)}
+          case FunctionDefs.execute(function_key, parsed_params) do
+            {:error, reason} -> {:error, format_error(reason)}
+            result -> {:ok, format_result(result)}
+          end
         rescue
           e -> {:error, "Execution error: #{Exception.message(e)}"}
         catch
@@ -50,6 +52,11 @@ defmodule Inspector.Dashboard.Runner do
   def format_result(term) do
     inspect(term, pretty: true, limit: :infinity, printable_limit: :infinity)
   end
+
+  defp format_error(:not_found), do: "Process not found"
+  defp format_error(:mailbox_too_large), do: "Mailbox too large (>1000 messages). Use force option."
+  defp format_error({:unknown_system_msg, _}), do: "Process does not support state inspection (not an OTP process)"
+  defp format_error(reason), do: inspect(reason, pretty: true)
 
   @spec parse_params(atom(), map()) :: map()
   def parse_params(function_key, raw_params) do
