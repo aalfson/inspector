@@ -14,6 +14,9 @@ defmodule Inspector.Dashboard.Page do
   alias Inspector.Dashboard.{FunctionDefs, Runner}
 
   @impl true
+  def init(opts), do: {:ok, opts}
+
+  @impl true
   def menu_link(_, _) do
     {:ok, "Inspector"}
   end
