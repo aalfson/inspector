@@ -121,6 +121,11 @@ defmodule Inspector.Dashboard.FunctionDefs do
     Enum.find(defs(), &(&1.key == key))
   end
 
+  @spec find_by_key_string(String.t()) :: map() | nil
+  def find_by_key_string(key_str) do
+    Enum.find(defs(), &(Atom.to_string(&1.key) == key_str))
+  end
+
   @spec grouped() :: [{atom(), [map()]}]
   def grouped do
     defs()

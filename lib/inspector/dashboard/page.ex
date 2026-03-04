@@ -164,8 +164,15 @@ defmodule Inspector.Dashboard.Page do
   @impl true
   def handle_event("form_change", params, socket) do
     socket = maybe_update_node(socket, params["node"])
-    socket = maybe_update_function(socket, params["function"])
-    socket = update_params(socket, params)
+    {socket, function_changed?} = maybe_update_function(socket, params["function"])
+
+    socket =
+      if function_changed? do
+        socket
+      else
+        update_params(socket, params)
+      end
+
     {:noreply, socket}
   end
 
@@ -218,25 +225,38 @@ defmodule Inspector.Dashboard.Page do
   defp maybe_update_node(socket, nil), do: socket
 
   defp maybe_update_node(socket, node_name) do
-    assign(socket, :selected_node, String.to_existing_atom(node_name))
+    node_atom = String.to_existing_atom(node_name)
+    allowed = [node() | Node.list()]
+
+    if node_atom in allowed do
+      assign(socket, :selected_node, node_atom)
+    else
+      socket
+    end
   end
 
-  defp maybe_update_function(socket, nil), do: socket
+  defp maybe_update_function(socket, nil), do: {socket, false}
 
   defp maybe_update_function(socket, key_str) do
-    key = String.to_existing_atom(key_str)
+    func_def = FunctionDefs.find_by_key_string(key_str)
 
-    if key == socket.assigns.selected_function do
-      socket
-    else
-      func_def = FunctionDefs.get(key)
+    cond do
+      is_nil(func_def) ->
+        {socket, false}
 
-      socket
-      |> assign(:selected_function, key)
-      |> assign(:func_def, func_def)
-      |> assign(:params, %{})
-      |> assign(:result, nil)
-      |> assign(:error, nil)
+      func_def.key == socket.assigns.selected_function ->
+        {socket, false}
+
+      true ->
+        socket =
+          socket
+          |> assign(:selected_function, func_def.key)
+          |> assign(:func_def, func_def)
+          |> assign(:params, %{})
+          |> assign(:result, nil)
+          |> assign(:error, nil)
+
+        {socket, true}
     end
   end
 

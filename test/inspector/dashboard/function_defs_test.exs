@@ -39,11 +39,22 @@ defmodule Inspector.Dashboard.FunctionDefsTest do
     end
   end
 
+  describe "find_by_key_string/1" do
+    test "finds def by string key" do
+      func = FunctionDefs.find_by_key_string("top_memory")
+      assert func.key == :top_memory
+    end
+
+    test "returns nil for unknown string" do
+      assert FunctionDefs.find_by_key_string("nonexistent") == nil
+    end
+  end
+
   describe "grouped/0" do
     test "returns 3 groups in order" do
       groups = FunctionDefs.grouped()
       keys = Enum.map(groups, &elem(&1, 0))
-      assert keys == [:process, :top, :aggregate]
+      assert keys == [:top, :aggregate, :process]
     end
 
     test "each group has at least one function" do

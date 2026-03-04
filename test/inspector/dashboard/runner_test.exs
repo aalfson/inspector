@@ -59,9 +59,30 @@ defmodule Inspector.Dashboard.RunnerTest do
     end
   end
 
+  describe "execute/3 — unwraps {:ok, _}" do
+    test "process_info result does not contain :ok tuple wrapper" do
+      pid = spawn(fn -> Process.sleep(:infinity) end)
+
+      assert {:ok, result} = Runner.execute(:process_info, node(), %{"pid" => inspect(pid)})
+      refute result =~ ~r/^\{:ok,/
+
+      Process.exit(pid, :kill)
+    end
+
+    test "top_memory result does not contain :ok tuple wrapper" do
+      assert {:ok, result} = Runner.execute(:top_memory, node(), %{"n" => "3"})
+      refute result =~ ~r/^\{:ok,/
+    end
+  end
+
   describe "execute/3 — error handling" do
     test "unknown function key" do
       assert {:error, "Unknown function: bogus"} = Runner.execute(:bogus, node(), %{})
+    end
+
+    test "disconnected node" do
+      assert {:error, "Node not connected: " <> _} =
+               Runner.execute(:top_memory, :fake@nowhere, %{})
     end
   end
 
