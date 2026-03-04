@@ -34,27 +34,6 @@ defmodule Inspector.Dashboard.FunctionDefs do
   defp defs do
     [
       %{
-        key: :process_info,
-        label: "Process Info",
-        group: :process,
-        description: "Detailed info about a process: meta, signals, location, memory, work.",
-        inputs: [pid_input()]
-      },
-      %{
-        key: :mailbox,
-        label: "Mailbox",
-        group: :process,
-        description: "Messages from a process's mailbox with safety limits.",
-        inputs: [pid_input(), limit_input()]
-      },
-      %{
-        key: :state,
-        label: "State",
-        group: :process,
-        description: "Internal state of an OTP process (GenServer, gen_statem, etc).",
-        inputs: [pid_input(), timeout_input()]
-      },
-      %{
         key: :top_memory,
         label: "Top Memory",
         group: :top,
@@ -109,6 +88,27 @@ defmodule Inspector.Dashboard.FunctionDefs do
         group: :aggregate,
         description: "Groups all processes by initial call function, counts descending.",
         inputs: []
+      },
+      %{
+        key: :process_info,
+        label: "Process Info",
+        group: :process,
+        description: "Detailed info about a process: meta, signals, location, memory, work.",
+        inputs: [pid_input()]
+      },
+      %{
+        key: :mailbox,
+        label: "Mailbox",
+        group: :process,
+        description: "Messages from a process's mailbox with safety limits.",
+        inputs: [pid_input(), limit_input()]
+      },
+      %{
+        key: :state,
+        label: "State",
+        group: :process,
+        description: "Internal state of an OTP process (GenServer, gen_statem, etc).",
+        inputs: [pid_input(), timeout_input()]
       }
     ]
   end
