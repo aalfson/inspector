@@ -126,7 +126,7 @@ defmodule Inspector.Dashboard.FunctionDefs do
     defs()
     |> Enum.group_by(& &1.group)
     |> then(fn groups ->
-      for group <- [:process, :top, :aggregate], Map.has_key?(groups, group) do
+      for group <- [:top, :aggregate, :process], Map.has_key?(groups, group) do
         {group, Map.fetch!(groups, group)}
       end
     end)
