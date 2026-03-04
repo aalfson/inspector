@@ -54,8 +54,13 @@ defmodule Inspector.Dashboard.Runner do
   end
 
   defp format_error(:not_found), do: "Process not found"
-  defp format_error(:mailbox_too_large), do: "Mailbox too large (>1000 messages). Use force option."
-  defp format_error({:unknown_system_msg, _}), do: "Process does not support state inspection (not an OTP process)"
+
+  defp format_error(:mailbox_too_large),
+    do: "Mailbox too large (>1000 messages). Use force option."
+
+  defp format_error({:unknown_system_msg, _}),
+    do: "Process does not support state inspection (not an OTP process)"
+
   defp format_error(reason), do: inspect(reason, pretty: true)
 
   @spec parse_params(atom(), map()) :: map()
