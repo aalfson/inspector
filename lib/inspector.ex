@@ -8,10 +8,13 @@ defmodule Inspector do
 
   ## Modules
 
-    * `Inspector.Utils` — PID parsing/conversion
+    * `Inspector.Utils` — PID/port parsing/conversion
     * `Inspector.Process` — single-process inspection
     * `Inspector.Top` — top N processes by attribute
     * `Inspector.Aggregate` — function-count aggregations
+    * `Inspector.Network` — top N network ports by packet/byte metrics
+    * `Inspector.Port` — detailed port inspection
+    * `Inspector.System` — port types, node stats, scheduler usage
   """
 
   # -- Process inspection (delegates to Inspector.Process) --
@@ -145,4 +148,60 @@ defmodule Inspector do
   See `Inspector.Aggregate.initial_calls/2` for options.
   """
   defdelegate initial_calls(pid_inputs, opts \\ []), to: Inspector.Aggregate
+
+  # -- Network (delegates to Inspector.Network) --
+
+  @doc """
+  Top `n` network ports by attribute (absolute snapshot).
+
+  See `Inspector.Network.inet_count/2`.
+  """
+  @spec inet_count(atom(), pos_integer()) ::
+          {:ok, [Inspector.Network.result()]} | {:error, term()}
+  defdelegate inet_count(attribute \\ :cnt, n \\ 10), to: Inspector.Network
+
+  @doc """
+  Top `n` network ports by attribute over a time window.
+
+  See `Inspector.Network.inet_window/3`.
+  """
+  @spec inet_window(atom(), pos_integer(), pos_integer()) ::
+          {:ok, [Inspector.Network.result()]} | {:error, term()}
+  defdelegate inet_window(attribute \\ :cnt, n \\ 10, millis \\ 1000), to: Inspector.Network
+
+  # -- Port (delegates to Inspector.Port) --
+
+  @doc """
+  Returns detailed info about a port.
+
+  See `Inspector.Port.info/1`.
+  """
+  @spec port_info(Inspector.Utils.port_input()) :: {:ok, term()} | {:error, term()}
+  defdelegate port_info(port_input), to: Inspector.Port, as: :info
+
+  # -- System (delegates to Inspector.System) --
+
+  @doc """
+  Returns all port types currently open with their counts.
+
+  See `Inspector.System.port_types/0`.
+  """
+  @spec port_types() :: {:ok, [{charlist(), pos_integer()}]}
+  defdelegate port_types(), to: Inspector.System
+
+  @doc """
+  Samples node statistics.
+
+  See `Inspector.System.node_stats/2`.
+  """
+  @spec node_stats(non_neg_integer(), non_neg_integer()) :: {:ok, term()} | {:error, term()}
+  defdelegate node_stats(repeat \\ 1, interval \\ 0), to: Inspector.System
+
+  @doc """
+  Measures scheduler utilization over a time window.
+
+  See `Inspector.System.scheduler_usage/1`.
+  """
+  @spec scheduler_usage(pos_integer()) :: {:ok, [{pos_integer(), float()}]} | {:error, term()}
+  defdelegate scheduler_usage(millis \\ 1000), to: Inspector.System
 end

@@ -89,6 +89,7 @@ defmodule Inspector.Dashboard.Runner do
           {_, ""} -> nil
           {:number, str} -> parse_integer(str)
           {:text, str} -> str
+          {:select, str} -> parse_select(str, input.options)
         end
 
       {key, value}
@@ -101,6 +102,14 @@ defmodule Inspector.Dashboard.Runner do
     case Integer.parse(str) do
       {n, ""} -> n
       _ -> nil
+    end
+  end
+
+  defp parse_select(str, options) do
+    if Enum.any?(options, &(to_string(&1) == str)) do
+      String.to_existing_atom(str)
+    else
+      nil
     end
   end
 end

@@ -12,7 +12,10 @@ defmodule Inspector.Dashboard.FunctionDefsTest do
       for func <- FunctionDefs.all() do
         assert is_atom(func.key), "key missing for #{inspect(func)}"
         assert is_binary(func.label), "label missing for #{func.key}"
-        assert func.group in [:process, :top, :aggregate], "invalid group for #{func.key}"
+
+        assert func.group in [:process, :top, :aggregate, :network, :port, :system],
+               "invalid group for #{func.key}"
+
         assert is_binary(func.description), "description missing for #{func.key}"
         assert is_list(func.inputs), "inputs missing for #{func.key}"
       end
@@ -22,7 +25,7 @@ defmodule Inspector.Dashboard.FunctionDefsTest do
       for func <- FunctionDefs.all(), input <- func.inputs do
         assert is_atom(input.name), "input name missing in #{func.key}"
         assert is_binary(input.label), "input label missing in #{func.key}"
-        assert input.type in [:text, :number], "invalid input type in #{func.key}"
+        assert input.type in [:text, :number, :select], "invalid input type in #{func.key}"
       end
     end
   end
@@ -51,10 +54,10 @@ defmodule Inspector.Dashboard.FunctionDefsTest do
   end
 
   describe "grouped/0" do
-    test "returns 3 groups in order" do
+    test "returns 6 groups in order" do
       groups = FunctionDefs.grouped()
       keys = Enum.map(groups, &elem(&1, 0))
-      assert keys == [:top, :aggregate, :process]
+      assert keys == [:top, :aggregate, :process, :network, :port, :system]
     end
 
     test "each group has at least one function" do
