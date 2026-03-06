@@ -16,7 +16,7 @@ defmodule Inspector.System do
       {:ok, [{"efile", 23}, {"tcp_inet", 4}]}
 
   """
-  @spec port_types() :: {:ok, [{String.t(), pos_integer()}]}
+  @spec port_types() :: {:ok, [{charlist(), pos_integer()}]}
   def port_types do
     {:ok, :recon.port_types()}
   end

@@ -41,8 +41,8 @@ defmodule Inspector.NetworkTest do
   end
 
   describe "inet_window/3" do
-    test "returns {:ok, list} with defaults" do
-      assert {:ok, results} = Network.inet_window()
+    test "returns {:ok, list} with explicit short duration" do
+      assert {:ok, results} = Network.inet_window(:cnt, 10, 100)
       assert is_list(results)
     end
 

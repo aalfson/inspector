@@ -149,7 +149,7 @@ defmodule Inspector.Utils do
   def to_port(name) when is_atom(name) do
     case Port.info(name) do
       nil -> raise ArgumentError, "no port registered as #{inspect(name)}"
-      _info -> {:erlang.whereis(name), name} |> elem(0)
+      _info -> :erlang.whereis(name)
     end
   end
 

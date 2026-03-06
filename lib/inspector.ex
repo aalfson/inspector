@@ -186,7 +186,7 @@ defmodule Inspector do
 
   See `Inspector.System.port_types/0`.
   """
-  @spec port_types() :: {:ok, [{String.t(), pos_integer()}]}
+  @spec port_types() :: {:ok, [{charlist(), pos_integer()}]}
   defdelegate port_types(), to: Inspector.System
 
   @doc """
