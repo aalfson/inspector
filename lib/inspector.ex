@@ -204,4 +204,18 @@ defmodule Inspector do
   """
   @spec scheduler_usage(pos_integer()) :: {:ok, [{pos_integer(), float()}]} | {:error, term()}
   defdelegate scheduler_usage(millis \\ 1000), to: Inspector.System
+
+  # -- Tracing (delegates to Inspector.Tracing) --
+
+  @doc """
+  Profiles function calls for the given pid(s) using `:eprof`.
+
+  See `Inspector.Tracing.profile/2`.
+  """
+  @spec profile(
+          pid() | Inspector.Utils.pid_input() | [Inspector.Utils.pid_input()],
+          non_neg_integer()
+        ) ::
+          {:ok, :done} | {:error, term()}
+  defdelegate profile(pid_input, duration_ms \\ 10), to: Inspector.Tracing
 end
