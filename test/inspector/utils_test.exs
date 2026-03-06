@@ -113,6 +113,66 @@ defmodule Inspector.UtilsTest do
     end
   end
 
+  describe "to_port/1" do
+    test "passes through an actual port" do
+      port = hd(Port.list())
+      assert Utils.to_port(port) == port
+    end
+
+    test "converts a #Port<0.X> string" do
+      port = hd(Port.list())
+      str = inspect(port)
+      assert Utils.to_port(str) == port
+    end
+
+    test "converts a <0.X> angle-bracket string" do
+      port = hd(Port.list())
+      str = inspect(port) |> String.replace("#Port", "")
+      assert Utils.to_port(str) == port
+    end
+
+    test "converts an integer index" do
+      port = hd(Port.list())
+      index = port_index(port)
+      assert Utils.to_port(index) == port
+    end
+
+    test "raises ArgumentError for invalid string" do
+      assert_raise ArgumentError, ~r/cannot convert/, fn ->
+        Utils.to_port("not_a_port")
+      end
+    end
+
+    test "raises ArgumentError for unsupported types" do
+      assert_raise ArgumentError, ~r/cannot convert/, fn ->
+        Utils.to_port({1, 2})
+      end
+    end
+  end
+
+  describe "safe_to_port/1" do
+    test "returns {:ok, port} for valid input" do
+      port = hd(Port.list())
+      assert {:ok, ^port} = Utils.safe_to_port(port)
+    end
+
+    test "returns {:ok, port} for string input" do
+      port = hd(Port.list())
+      str = inspect(port)
+      assert {:ok, ^port} = Utils.safe_to_port(str)
+    end
+
+    test "returns {:error, reason} for invalid input" do
+      assert {:error, msg} = Utils.safe_to_port("garbage")
+      assert is_binary(msg)
+    end
+  end
+
+  defp port_index(port) do
+    [_, index_str] = Regex.run(~r/#Port<0\.(\d+)>/, inspect(port))
+    String.to_integer(index_str)
+  end
+
   defp pid_components(pid) do
     [a, b, c] =
       pid

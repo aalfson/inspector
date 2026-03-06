@@ -119,13 +119,21 @@ defmodule Inspector.Dashboard.Page do
           <%= for input <- @func_def.inputs do %>
             <div class="inspector-field">
               <label><%= input.label %></label>
-              <input
-                type={input_type(input.type)}
-                name={input.name}
-                value={Map.get(@params, to_string(input.name), input.default || "")}
-                placeholder={input.placeholder}
-                phx-debounce="300"
-              />
+              <%= if input.type == :select do %>
+                <select name={input.name}>
+                  <%= for opt <- input.options do %>
+                    <option value={opt} selected={to_string(opt) == Map.get(@params, to_string(input.name), to_string(input.default))}><%= opt %></option>
+                  <% end %>
+                </select>
+              <% else %>
+                <input
+                  type={input_type(input.type)}
+                  name={input.name}
+                  value={Map.get(@params, to_string(input.name), input.default || "")}
+                  placeholder={input.placeholder}
+                  phx-debounce="300"
+                />
+              <% end %>
             </div>
           <% end %>
         <% end %>
@@ -221,6 +229,9 @@ defmodule Inspector.Dashboard.Page do
   defp group_label(:process), do: "Process"
   defp group_label(:top), do: "Top N"
   defp group_label(:aggregate), do: "Aggregate"
+  defp group_label(:network), do: "Network"
+  defp group_label(:port), do: "Port"
+  defp group_label(:system), do: "System"
 
   defp input_type(:number), do: "number"
   defp input_type(:text), do: "text"
